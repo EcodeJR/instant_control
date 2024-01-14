@@ -24,11 +24,11 @@ const RootLayout = () => {
         {loading ? (<Loading />) :
       (
         <section className="w-screen h-full scroll-smooth flex">
-            <div className="flex-shrink-0 w-[20vw] h-screen border-r-2 border-primary overflow-hidden">
+            <div className="flex-shrink-0 w-[20vw] h-screen overflow-hidden">
                 <SideBar />
             </div>
             <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex-1 border-2 border-primary overflow-hidden">
+                <div className="flex-1 overflow-hidden">
                     <Outlet />
                 </div>
                 
