@@ -2,7 +2,8 @@ import Dashboard from './pages/Dashboard';
 //pages
 import Contacts from './pages/Contacts';
 import Newslatters from './pages/Newslatters';
-
+import Booking from './pages/Booking';
+import Gallery from './pages/Gallery';
 
 import { 
   createBrowserRouter,
@@ -13,6 +14,7 @@ import {
   //Layout
 import RootLayout from './pages/RootLayout';
 import NotFound from './pages/NotFound';
+
 // import GallaryPage from './pages/GallaryPage';
 // import Policies from './pages/policies';
 // import Terms from './pages/Terms&Conditions';
@@ -29,6 +31,8 @@ const router = createBrowserRouter(
           <Route index element={<Dashboard />} />
           <Route path='contacts' element={<Contacts />} />
           <Route path='newslatters' element={<Newslatters />} />
+          <Route path='booking' element={<Booking />} />
+          <Route path="gallery" element={<Gallery />} />
           <Route path='*' element={<NotFound />} />
         </Route>
   )
