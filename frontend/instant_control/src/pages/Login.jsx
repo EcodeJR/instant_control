@@ -24,9 +24,13 @@ const Login = () => {
       };
 
       const handleSubmit = async (e) => {
-        e.preventDefault();
-      
-        try {
+        
+        if (username && password == '') {
+            e.preventDefault();
+            toast.error('Enter your credentials')
+        }else{
+            e.preventDefault();
+            try {
           const result = await checkingUser(username, password);
       
           if (result.success) {
@@ -46,6 +50,8 @@ const Login = () => {
           console.error('Unexpected error:', error);
           toast.error('Unexpected error. Please try again.');
         }
+        }
+      
       };
     // function CheckingDets(e) {
     //     e.preventDefault();
