@@ -1,6 +1,6 @@
 const Contacts = () => {
     return ( <>
-    <div className="w-full h-full text-primary p-5 absolute top-0 left-0">
+    <div className="w-full h-full text-primary p-5 block lg:absolute top-0 left-0">
         <h1 className="text-3xl text-center font-semibold uppercase">Contacts</h1>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 place-items-center gap-3 py-5">
             <div className="p-3 text-primary border-2 border-primary">

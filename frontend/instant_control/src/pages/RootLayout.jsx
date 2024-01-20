@@ -23,19 +23,18 @@ const RootLayout = () => {
     return ( <>
         {loading ? (<Loading />) :
       (
-        <section className="w-screen h-full scroll-smooth flex">
-            <div className="flex-shrink-0 w-[20vw] h-screen overflow-hidden">
-                <SideBar />
-            </div>
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex-1 relative overflow-y-scroll overflow-hidden">
-                    <Outlet />
-                </div>
-                
-                <Footer />
-            </div>
-            
+        <section className="w-screen h-full scroll-smooth flex flex-col lg:flex-row">
+          <div className="flex-shrink-0 w-full lg:w-[20vw] h-[5vh] lg:h-screen overflow-hidden">
+              <SideBar />
+          </div>
+          <div className="lg:flex-1 flex flex-col overflow-hidden flex-grow">
+              <div className="lg:flex-1 relative overflow-y-scroll overflow-hidden h-full">
+                <Outlet />
+              </div>
+              <Footer />
+          </div>
         </section>
+
       )
     }
     </> );
