@@ -4,8 +4,11 @@ import { MdContactMail } from "react-icons/md";
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import { RiGalleryFill } from "react-icons/ri";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 
+import Cookies from 'js-cookie';
+import axios from "axios";
 
 var links = [
     {
@@ -42,8 +45,32 @@ var links = [
 
 
 
-const Sidebar = () => {
+
+const Sidebar = ({ onLogout, username }) => {
     const [openNav, isOpen] = useState(false);
+
+    const [user, setUser] = useState(null);
+//   const userId = match.params.userId;
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        // Make a GET request to your Express.js server to get user details by ID
+        const response = await axios.get(`http://localhost:8080/user/${username}`);
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+
+    fetchUserDetails();
+  }, [username]);
+
+    const Logout = () => {
+        const token = '';
+        onLogout(token);
+        Cookies.remove('token');
+    }
 
     const smallScreen = <>
      <nav className="w-[60vw] lg:w-full h-full bg-gray-100 text-primary fixed z-50 lg:block top-0">
@@ -65,11 +92,12 @@ const Sidebar = () => {
                 <div className="p-5 rounded-md bg-white flex flex-col min-w-[70%]">
                     <div className="flex items-end justify-center pb-3">
                         <div className="w-10 h-10 bg-primary text-white rounded-full grid place-items-center mx-2">IMG</div>
-                        <p className="font-semibold text-base">User`s name</p>
+                        
+                        {user ? (<p className="font-semibold text-base">{user.username}</p>) : (<p>Please Login first..</p>)}
                     </div>
                     <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>
                     <NavLink to='settings' className="text-lg mx-auto">Settings</NavLink>
-                    <button className="text-lg font-semibold text-red-600">LOG OUT</button>
+                    <button className="text-lg font-semibold text-red-600" onClick={Logout}>LOG OUT</button>
                 </div>
             </div>
         </nav>
@@ -108,16 +136,21 @@ const Sidebar = () => {
             <div className="p-5 rounded-md bg-white flex flex-col min-w-[70%]">
                 <div className="flex items-end justify-center pb-3">
                     <div className="w-10 h-10 bg-primary text-white rounded-full grid place-items-center mx-2">IMG</div>
-                    <p className="font-semibold text-base">User`s name</p>
+                    {user ? (<p className="font-semibold text-base">{user.username}</p>) : (<p>Please Login first..</p>)}
                 </div>
                 <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>
                 <NavLink to='settings' className="text-lg mx-auto">Settings</NavLink>
-                <button className="text-lg font-semibold text-red-600">LOG OUT</button>
+                <button className="text-lg font-semibold text-red-600" onClick={Logout}>LOG OUT</button>
             </div>
         </div>
     </nav>
     {openNav ? smallScreen : null}
     </> );
 }
- 
+
+
+Sidebar.propTypes = {
+    onLogout: PropTypes.func.isRequired,
+    username: PropTypes.func.isRequired,
+  }; 
 export default Sidebar;

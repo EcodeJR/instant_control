@@ -12,51 +12,54 @@ import {
   Route, 
   createRoutesFromElements,
   RouterProvider,
+  Navigate,
   } from 'react-router-dom';
   //Layout
 import RootLayout from './pages/RootLayout';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
-// import { useState } from 'react';
+import { useState } from 'react';
+import Cookies from 'js-cookie';
 
-// import GallaryPage from './pages/GallaryPage';
-// import Policies from './pages/policies';
-// import Terms from './pages/Terms&Conditions';
-{
-
-  /** import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'*/
-
-}
-
-
-// const [authenticated, setAuthenticated] = useState(false);
-
-//   const handleLogin = () => {
-//     // Your login logic here
-//     // For simplicity, let's assume successful login for any non-empty input
-//     setAuthenticated(true);
-//   };
-
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-        <Route path='/' element={<RootLayout />}>
-          <Route index element={<Login />} />
-          <Route path='dashboard' element={<Dashboard />} />
-          <Route path='contacts' element={<Contacts />} />
-          <Route path='newslatters' element={<Newslatters />} />
-          <Route path='booking' element={<Booking />} />
-          <Route path="gallery" element={<Gallery />} />
-          <Route path="adduser" element={<AddUser />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path='*' element={<NotFound />} />
-        </Route>
-  )
-)
 
 function App() {
 
+const handleLogin = (token) => {
+    setToken(token);
+  // Set a cookie for the token with an expiration of 3 days
+  Cookies.set('token', token, { expires: 3 });
+  };
+
+  const handleLogout = () => {
+    setToken('');
+    // Remove the cookie for the token
+    Cookies.remove('token');
+    console.log('logged out')
+  };
+
+  const tokenCookie = Cookies.get('token');
+  const [token, setToken] = useState(tokenCookie || '');
+  
+  
+  // const location = useLocation();
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+          <Route path='/' element={<RootLayout />}>
+            <Route index element={<Login onLogin={handleLogin} />} />
+
+            <Route path='dashboard' element={token ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/"/>} />
+            <Route path='contacts' element={token ? <Contacts /> : <Navigate to="/"/>} />
+            <Route path='newslatters' element={token ? <Newslatters /> : <Navigate to="/"/>} />
+            <Route path='booking' element={token ? <Booking /> : <Navigate to="/"/>} />
+            <Route path="gallery" element={token ? <Gallery /> : <Navigate to="/"/>} />
+            <Route path="adduser" element={token ? <AddUser /> : <Navigate to="/"/>} />
+            <Route path="settings" element={token ? <Settings /> : <Navigate to="/"/>} />
+
+            <Route path='*' element={<NotFound />} />
+          </Route>
+    )
+  )
+  
   return (
     <>
         <RouterProvider router={router} />

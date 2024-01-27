@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+// import crypto from 'crypto';
 // import axios from 'axios';
 
 // const router = express.Router();
@@ -77,16 +79,132 @@ app.post('/api/login', async (req, res) => {
     const user = await PutUser.findOne({ username });
 
     if (user) {
-      // Compare the entered password with the hashed password stored in the database
-      const passwordMatch = await bcrypt.compare(password, user.password);
-
-      if (passwordMatch) {
-        res.json({ success: true });
+      // Compare hashed password
+      const match = await bcrypt.compare(password, user.password);
+      const secretKey = process.env.SECRKEY;
+  
+      if (match) {
+        // Generate a token with expiration time (e.g., 1 hour)
+        const newToken = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+  
+        res.status(200).json({ newToken });
       } else {
-        res.status(401).json({ success: false, message: 'Invalid credentials' });
+        res.status(401).send('Incorrect password');
       }
+    } else {
+      res.status(404).send('User not found');
     }
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+//getting users data
+app.get('/user/:username', async (req, res) => {
+  const { username } = req.params; // Use req.params to get values from the route parameters
+
+  try {
+    // Retrieve user data from MongoDB based on the username
+    const user = await PutUser.findOne({ username });
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // Render the 'users' view and pass the user data
+    res.render('users', { user });
+    console.log(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Define MongoDB model for Newsletter
+const newsletterSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true, lowercase: true },
+});
+
+const Newsletter = mongoose.model('Newslatter', newsletterSchema);
+
+// Define MongoDB model for Contact Forms
+const contact_us = new mongoose.Schema({
+  name: { type: String, 
+    required: true
+ },
+ phone: { type: Number, 
+    required: true
+ },
+email: { type: String, 
+    required: true,
+    lowercase: true
+ },
+ message: { type: String, 
+    required: true
+ }
+});
+const UserContact = mongoose.model('Contact_us', contact_us);
+
+//Define MongoDB model for Booking
+const Booking = new Schema({
+  name: { type: String, 
+      required: true
+   },
+   phone: { type: Number, 
+      required: true
+   },
+  email: { type: String, 
+      required: true,
+      lowercase: true
+   },
+   location: { type: String, 
+      required: true
+   },
+   date: { type: Date, 
+      required: true
+   }
+}, { timestamps: true });
+
+const UserBooking = mongoose.model('Booking', Booking);
+
+
+// Get all emails
+app.get('/api/emails', async (req, res) => {
+  try {
+    const emails = await Newsletter.find().sort({ timestamp: -1 });
+    res.json(emails);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Get all contact forms
+app.get('/api/contact', async (req, res) => {
+  try {
+    const contact = await UserContact.find().sort({ timestamp: -1 });
+
+    if (!contact) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+    res.json(contact);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all Booking Ticket
+app.get('/api/tickets', async (req, res) => {
+  try {
+    const tickets = await UserBooking.find().sort({ timestamp: -1 });
+
+    if (!tickets) {
+      return res.status(404).json({ error: 'Tickets not found' });
+    }
+    res.json(tickets);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
