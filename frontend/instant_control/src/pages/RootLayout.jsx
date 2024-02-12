@@ -39,11 +39,13 @@ const RootLayout = () => {
         {loading ? (<Loading />) :
       (
         <section className="w-screen h-full scroll-smooth flex flex-col lg:flex-row">
-          <div className="flex-shrink-0 w-full lg:w-[20vw] h-[5vh] lg:h-screen overflow-hidden">
+          <div className="flex-shrink-0 w-full lg:w-[20vw] h-[7vh] lg:h-screen overflow-hidden relative">
               <SideBar onLogout={handleLogout} />
           </div>
           <div className="lg:flex-1 flex flex-col overflow-hidden flex-grow">
+            <marquee direction="left" className='py-2 text-base block bg-black/10 text-red-500 backdrop-blur'>WARNING! WARNING! WARNING! DO NOT DELETE ANYTHING HERE! EXCEPT WITH CLEAR AUTHORISATION FROM THE OWNER. AS IT DIRECTLY INTERACTS WITH THE DATABASE AND WILL BE PERMANENTLY DELETED!!</marquee>
               <div className="lg:flex-1 relative overflow-y-scroll overflow-hidden h-full">
+                
                 <Outlet />
               </div>
               <Footer />

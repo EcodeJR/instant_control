@@ -10,6 +10,12 @@ import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
 import axios from "axios";
 
+import { MdOutlineMenu } from "react-icons/md";
+import { MdClose } from "react-icons/md";
+
+import camp from '../assets/camp.jpg'
+
+
 var links = [
     {
         id: 1,
@@ -108,23 +114,22 @@ const Sidebar = ({ onLogout, username }) => {
         isOpen(!openNav);
     }
 
-
-
-
-
-
 // "w-full h-full bg-gray-100 text-primary absolute lg:block"
     
     return ( <>
-    <button className="absolute lg:hidden top-3 right-3 text-2xl font-bold z-30" onClick={toggleOpen}>MENU</button>
+    <div className="w-[50%] lg:w-full h-full lg:h-fit my-auto flex items-center justify-around py-2 px-4">
+        <NavLink to='messages'>Messages</NavLink>
+        <NavLink to='notifications'>Notification</NavLink>
+    </div>
+    <button className="absolute lg:hidden top-[50%] translate-y-[-50%] right-3 z-30" onClick={toggleOpen}>{openNav ? <MdClose className="text-3xl font-bold text-primary" /> : <MdOutlineMenu className="text-3xl font-bold text-primary" />}</button>
     <nav className="w-full h-full bg-gray-100 text-primary hidden lg:block relative">
-        <div className="w-full h-fit border-b-2 border-b-primary/10 py-7">
+        <div className="w-full h-fit border-b-2 border-b-primary/10 py-5">
             <h1 className="text-secondary font-semibold text-center text-4xl">INSTANT</h1>
         </div>
-        <div className="w-full h-fit py-10 flex flex-col items-center justify-around">
+        <div className="w-full h-fit py-5 flex flex-col items-center justify-around">
             <div className="w-fit mx-auto">
                 {links.map(link => (
-                  <div key={link.id} className="flex items-center justify-start w-full my-4 group hover:bg-primary p-2 rounded hover:text-white">
+                  <div key={link.id} className="flex items-center justify-start w-full my-3 group hover:bg-primary p-2 rounded hover:text-white">
                     {link.icon}
                     <NavLink to={link.addr} className={({ isActive }) => {
                         return "mx-2 font-semibold text-xl h-full w-full group-hover:text-white" +
@@ -135,7 +140,7 @@ const Sidebar = ({ onLogout, username }) => {
             </div>
             <div className="p-5 rounded-md bg-white flex flex-col min-w-[70%]">
                 <div className="flex items-end justify-center pb-3">
-                    <div className="w-10 h-10 bg-primary text-white rounded-full grid place-items-center mx-2">IMG</div>
+                    <img src={camp} alt="man sitting" className="w-10 h-10 bg-primary text-white rounded-full mx-2 object-cover" />
                     {user ? (<p className="font-semibold text-base">{user.username}</p>) : (<p>Please Login first..</p>)}
                 </div>
                 <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>

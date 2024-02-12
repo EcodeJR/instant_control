@@ -20,6 +20,8 @@ import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
+import Messages from './pages/Messages';
+import Notifications from './pages/Notifications';
 
 
 function App() {
@@ -52,8 +54,14 @@ const handleLogin = (token) => {
             <Route path='newslatters' element={token ? <Newslatters /> : <Navigate to="/"/>} />
             <Route path='booking' element={token ? <Booking /> : <Navigate to="/"/>} />
             <Route path="gallery" element={token ? <Gallery /> : <Navigate to="/"/>} />
+
+            
             <Route path="adduser" element={token ? <AddUser /> : <Navigate to="/"/>} />
             <Route path="settings" element={token ? <Settings /> : <Navigate to="/"/>} />
+
+
+            <Route path="messages" element={token ? <Messages /> : <Navigate to="/"/>} />
+            <Route path="notifications" element={token ? <Notifications /> : <Navigate to="/"/>} />
 
             <Route path='*' element={<NotFound />} />
           </Route>

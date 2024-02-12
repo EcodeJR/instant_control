@@ -85,7 +85,7 @@ const Login = ({ onLogin }) => {
         <div className='w-full lg:w-[50vw] h-[40vh] lg:h-full relative'>
             {/* {loggedIn ? <p>User is logged in.</p> : <p>User is not logged in.</p>} */}
             <img src={Logimage} alt="bg image" className='h-full w-full object-cover' />
-            <div className='absolute bottom-5 left-[50%] translate-x-[-50%] bg-black/50 p-4 flex items-center justify-center w-[90%] rounded-md'>
+            <div className='absolute bottom-5 left-[50%] translate-x-[-50%] bg-black/20 backdrop-blur-sm p-4 flex items-center justify-center w-[90%] rounded-md'>
                 <p className='text-lg font-semibold text-center text-white'>Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
             </div>
         </div>

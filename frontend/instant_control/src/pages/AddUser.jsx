@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 function AddUser() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [users, setUsers] = useState([]);
 
     // const handleSubmit = async e => {
     //     e.preventDefault();
@@ -62,6 +63,39 @@ function AddUser() {
           toast.error('Unexpected error. Please try again.');
         }
       };
+
+      useEffect(() => {
+        axios.get('http://localhost:8080/api/findusers')
+        .then(response => {
+          setUsers(response.data)
+        })
+        .catch(error => {
+          console.log("Could not fetch users", error)
+        })
+      },[])
+
+      const handleDeleteUser = (userId) => {
+        // Make a DELETE request to delete the user
+        fetch(`http://localhost:8080/api/deleteuser/${userId}`, {
+          method: 'DELETE',
+        })
+          .then((response) => {
+            if (response.ok) {
+              // If deletion is successful, update the activeUsers state
+              setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+              toast.success('User Deleted!');
+            } else {
+              // If deletion is not successful, handle the error
+              console.error('Error deleting user:', response.statusText);
+              toast.error('Error deleting user!');
+            }
+          })
+          .catch((error) => {
+            console.error('Error deleting user:', error)
+            toast.error('Network Error!');
+          });
+      };
+
       
     return ( <>
     <ToastContainer />
@@ -89,21 +123,16 @@ function AddUser() {
                 </div>
                 
             </form>
-            <div className="flex flex-col items-center justify-around p-5 text-white bg-primary w-[80%] md:w-[30%] rounded-lg">
+            <div className="flex flex-col items-center justify-around p-5 text-white bg-primary w-[80%] md:w-[30%] rounded-lg my-3 lg:my-0">
                 <h4 className="font-semibold text-3xl">Active users</h4>
                 <ol className="my-7 list-decimal w-full">
-                    <li className="flex items-center justify-around px-1 py-2 border-b-2 border-b-white">
-                        <p className="text-lg">Ecodejr</p>
-                        <button className="font-bold text-red-600">Del</button>
+                    
+                    {users.map(user => (
+                      <li className="flex items-center justify-around px-1 py-2 border-b-2 border-b-white" key={user._id}>
+                        <p className="text-lg">{user.username}</p>
+                        <button className="font-bold text-red-600" onClick={() => handleDeleteUser(user._id)}>Del</button>
                     </li>
-                    <li className="flex items-center justify-around px-1 py-2 border-b-2 border-b-white">
-                        <p className="text-lg">Ecodejr</p>
-                        <button className="font-bold text-red-600">Del</button>
-                    </li>
-                    <li className="flex items-center justify-around px-1 py-2 border-b-2 border-b-white">
-                        <p className="text-lg">Ecodejr</p>
-                        <button className="font-bold text-red-600">Del</button>
-                    </li>
+                    ))}
                 </ol>
             </div>
         </div>

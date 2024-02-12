@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 // import crypto from 'crypto';
 // import axios from 'axios';
 
@@ -208,3 +209,122 @@ app.get('/api/tickets', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+//Getting the users from database
+app.get('/api/findusers', async (req, res) => {
+  try {
+    const ActiveUsers = await PutUser.find().sort({ timestamp: -1 });
+
+    if (!ActiveUsers) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+    res.json(ActiveUsers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//deleting users
+app.delete('/api/deleteuser/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Check if the user exists
+    const userToDelete = await PutUser.findById(userId);
+
+    if (!userToDelete) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Perform the deletion
+    await PutUser.deleteOne({ _id: userId });
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//deleting newslatter email
+app.delete('/api/deletemail/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Check if the user exists
+    const emailToDelete = await Newsletter.findById(userId);
+
+    if (!emailToDelete) {
+      return res.status(404).json({ error: 'Mail not found' });
+    }
+
+    // Perform the deletion
+    await Newsletter.deleteOne({ _id: userId });
+
+    res.json({ message: 'Mail deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//deleting contact messages
+app.delete('/api/deletecontact/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Check if the user exists
+    const contactToDelete = await UserContact.findById(userId);
+
+    if (!contactToDelete) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Perform the deletion
+    await UserContact.deleteOne({ _id: userId });
+
+    res.json({ message: 'Message deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API endpoint to send newsletter
+app.post('/send-newsletter', async (req, res) => {
+  const { subject, text } = req.body;
+
+  try {
+    // Fetch emails from MongoDB
+    const emails = await Newsletter.find();
+    
+    // Create a transporter object
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSCODE
+      }
+    });
+
+    // Send emails to each recipient
+    for (const email of emails) {
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: email.email,
+        subject: subject,
+        text: text
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
+
+    res.status(200).send('Newsletter sent successfully!');
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+console.log(process.env.EMAIL + "is the email and " + process.env.PASSCODE + "the password.");
