@@ -6,6 +6,8 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { Server } from 'socket.io';
+import http from 'http';
 // import crypto from 'crypto';
 // import axios from 'axios';
 
@@ -15,12 +17,33 @@ dotenv.config();
 const mongodbURL = process.env.DBURL;
 
 const app = express();
-
 app.use(cors({
-    origin: '*', // Replace with your frontend domain
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Enable credentials (if your frontend sends cookies, sessions, or authentication tokens)
-  }));
+  origin: '*', //http://localhost:5173
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: '*',
+  credentials: true, // Enable credentials (if your frontend sends cookies, sessions, or authentication tokens)
+}));
+// app.use(function (req, res, next) {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader("Access-Control-Allow-Methods", "*");
+//   res.setHeader("Access-Control-Allow-Headers", "*");
+//   next();
+// });
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST"]
+  }
+});
+
+
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*'); // You can specify specific origins instead of '*'
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   next();
+// });
 
 app.use(bodyParser.json());
   
@@ -29,7 +52,7 @@ var PORT = 8080;
 
 mongoose.connect(mongodbURL)
     .then((result) => {
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             const db = result.db;
             console.log('Connected to MongoDB at port: ' + PORT);
         })
@@ -37,7 +60,28 @@ mongoose.connect(mongodbURL)
     .catch((err) => console.log(err))
 
 
-    //Setting up mongoose schema for DB
+
+// Setting up socket.io to run from anywhere(domain).
+// io.origins('*:*');
+
+// Socket.IO event handlers
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Handle disconnection
+  socket.on('disconnect', () => {
+      console.log('User disconnected');
+  });
+
+  // Handle chat message
+  socket.on('chat message', (msg) => {
+      console.log('message: ' + msg);
+      io.emit('chat message', msg);
+  });
+});
+
+
+//Setting up mongoose schema for DB
 const Schema = mongoose.Schema;
 
 const NewUser = new Schema({
@@ -327,4 +371,4 @@ app.post('/send-newsletter', async (req, res) => {
   }
 });
 
-console.log(process.env.EMAIL + "is the email and " + process.env.PASSCODE + "the password.");
+// console.log(process.env.EMAIL + "is the email and " + process.env.PASSCODE + "the password.");

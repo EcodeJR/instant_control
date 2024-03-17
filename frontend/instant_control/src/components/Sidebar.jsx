@@ -52,25 +52,25 @@ var links = [
 
 
 
-const Sidebar = ({ onLogout, username }) => {
+const Sidebar = ({ onLogout }) => {
     const [openNav, isOpen] = useState(false);
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState('john');
 //   const userId = match.params.userId;
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        // Make a GET request to your Express.js server to get user details by ID
-        const response = await axios.get(`http://localhost:8080/user/${username}`);
-        setUser(response.data);
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-      }
-    };
+//   useEffect(() => {
+//     const fetchUserDetails = async () => {
+//       try {
+//         // Make a GET request to your Express.js server to get user details by ID
+//         const response = await axios.get(`http://localhost:8080/user/${username}`);
+//         setUser(response.data);
+//       } catch (error) {
+//         console.error('Error fetching user details:', error);
+//       }
+//     };
 
-    fetchUserDetails();
-  }, [username]);
+//     fetchUserDetails();
+//   }, []);
 
     const Logout = () => {
         const token = '';
@@ -99,7 +99,7 @@ const Sidebar = ({ onLogout, username }) => {
                     <div className="flex items-end justify-center pb-3">
                         <div className="w-10 h-10 bg-primary text-white rounded-full grid place-items-center mx-2">IMG</div>
                         
-                        {user ? (<p className="font-semibold text-base">{user.username}</p>) : (<p>Please Login first..</p>)}
+                        {user ? (<p className="font-semibold text-base">{user}</p>) : (<p>Please Login first..</p>)}
                     </div>
                     <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>
                     <NavLink to='settings' className="text-lg mx-auto">Settings</NavLink>
@@ -156,6 +156,6 @@ const Sidebar = ({ onLogout, username }) => {
 
 Sidebar.propTypes = {
     onLogout: PropTypes.func.isRequired,
-    username: PropTypes.func.isRequired,
+    // username: PropTypes.func.isRequired,
   }; 
 export default Sidebar;

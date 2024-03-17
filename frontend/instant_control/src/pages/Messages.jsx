@@ -1,6 +1,25 @@
 import camp from '../assets/camp.jpg'
+import { useEffect } from 'react';
+import io from 'socket.io-client';
 
 const Messages = () => {
+    const socket = io('http://localhost:8080');
+    useEffect(() => {
+        socket.on('connect', () => {
+          console.log('Socket Connected to server');
+        });
+        
+        socket.on('connect_error', (error) => {
+          console.log('Socket Connection error:', error);
+        });
+      
+        // Other event listeners or logic can be added here
+        
+        return () => {
+          socket.disconnect();
+          console.log('Socket disconnected')
+        };
+      }, []);
     return ( 
         <section className="w-full h-fit p-4 bg-primary text-white block lg:absolute top-0 left-0">
             <h1 className="text-center font-semibold text-xl lg:text-2xl" draggable='true'>Chat Room</h1>

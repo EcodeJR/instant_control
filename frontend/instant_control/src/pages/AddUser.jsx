@@ -99,7 +99,7 @@ function AddUser() {
       
     return ( <>
     <ToastContainer />
-    <div className="w-full p-3">
+    <div className="w-full p-3 block lg:absolute top-0 left-0">
         <h1 className="text-center text-3xl font-bold uppercase">Users</h1>
         <div className="flex flex-col md:flex-row items-center justify-around w-full py-10">
             <form className="flex flex-col items-center justify-around w-[80%] md:w-[50%] h-[60vh] md:h-[70vh] bg-primary/10 rounded-lg shadow-xl">
