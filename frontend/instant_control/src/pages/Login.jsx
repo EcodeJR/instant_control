@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import Cookies from 'js-cookie';
 
 const Login = ({ onLogin }) => {
     // const [loggedIn, isLoggedin] = useState(false);
@@ -17,6 +18,9 @@ const Login = ({ onLogin }) => {
       try {
         const response = await axios.post('http://localhost:8080/api/login', { username, password });
         const token = response.data.newToken;
+        console.log(response.data.userID)
+        Cookies.set('userID', response.data.userID, { expires: 3 });
+        localStorage.setItem('userID', response.data.userID);
         onLogin(token);
         return { success: true, token };
       } catch (error) {
@@ -56,12 +60,7 @@ const Login = ({ onLogin }) => {
         }
       
       };
-    // function CheckingDets(e) {
-    //     e.preventDefault();
-    //     isLoggedin(true);
-    //     document.getElementById('username').value = '';
-    //     document.getElementById('password').value = '';
-    // }
+   
     return ( <>
     
     <section className="w-screen h-screen fixed top-0 left-0 bg-white flex flex-col-reverse lg:flex-row items-center justify-center text-primary z-50">
@@ -83,7 +82,6 @@ const Login = ({ onLogin }) => {
             </form>
         </div>
         <div className='w-full lg:w-[50vw] h-[40vh] lg:h-full relative'>
-            {/* {loggedIn ? <p>User is logged in.</p> : <p>User is not logged in.</p>} */}
             <img src={Logimage} alt="bg image" className='h-full w-full object-cover' />
             <div className='absolute bottom-5 left-[50%] translate-x-[-50%] bg-black/20 backdrop-blur-sm p-4 flex items-center justify-center w-[90%] rounded-md'>
                 <p className='text-lg font-semibold text-center text-white'>Lorem ipsum dolor sit amet, consectetur adipisicing el</p>

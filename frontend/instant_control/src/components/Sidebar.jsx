@@ -13,7 +13,8 @@ import axios from "axios";
 import { MdOutlineMenu } from "react-icons/md";
 import { MdClose } from "react-icons/md";
 
-import camp from '../assets/camp.jpg'
+import camp from '../assets/camp.jpg';
+// import Cookies from 'js-cookie';
 
 
 var links = [
@@ -78,6 +79,24 @@ const Sidebar = ({ onLogout }) => {
         Cookies.remove('token');
     }
 
+    const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    // Replace with the user's ID or other identifier
+    const userId = Cookies.get('userID');
+    
+    // Make a request to the server for the username
+    axios.get(`http://localhost:8080/get-username?userId=${userId}`)
+      .then(response => {
+        // If the request was successful, set the username in the state
+        setUsername(response.data.user.username);
+        // console.log(response)
+      })
+      .catch(error => {
+        console.error('Error fetching username', error);
+      });
+  }, []);
+
     const smallScreen = <>
      <nav className="w-[60vw] lg:w-full h-full bg-gray-100 text-primary fixed z-50 lg:block top-0">
             <div className="w-full h-fit border-b-2 border-b-primary/10 py-7">
@@ -99,7 +118,7 @@ const Sidebar = ({ onLogout }) => {
                     <div className="flex items-end justify-center pb-3">
                         <div className="w-10 h-10 bg-primary text-white rounded-full grid place-items-center mx-2">IMG</div>
                         
-                        {user ? (<p className="font-semibold text-base">{user}</p>) : (<p>Please Login first..</p>)}
+                        {user ? (<p className="font-semibold text-base">{`WELCOME ${username}`}</p>) : (<p>Please Login first..</p>)}
                     </div>
                     <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>
                     <NavLink to='settings' className="text-lg mx-auto">Settings</NavLink>
@@ -132,20 +151,20 @@ const Sidebar = ({ onLogout }) => {
                   <div key={link.id} className="flex items-center justify-start w-full my-3 group hover:bg-primary p-2 rounded hover:text-white">
                     {link.icon}
                     <NavLink to={link.addr} className={({ isActive }) => {
-                        return "mx-2 font-semibold text-xl h-full w-full group-hover:text-white" +
+                        return "mx-2 font-semibold text-base h-full w-full group-hover:text-white" +
                         (isActive ? "w-full h-full p-2 rounded bg-primary text-white" : "text-white")
                     }}>{link.name}</NavLink>
                     </div>
                 ))}
             </div>
-            <div className="p-5 rounded-md bg-white flex flex-col min-w-[70%]">
-                <div className="flex items-end justify-center pb-3">
+            <div className="p-3 rounded-md bg-white flex flex-col min-w-[70%]">
+                <div className="flex items-end justify-center pb-2">
                     <img src={camp} alt="man sitting" className="w-10 h-10 bg-primary text-white rounded-full mx-2 object-cover" />
-                    {user ? (<p className="font-semibold text-base">{user.username}</p>) : (<p>Please Login first..</p>)}
+                    {user ? (<p className="font-semibold text-base">{`WELCOME ${username}`}</p>) : (<p>Please Login first..</p>)}
                 </div>
-                <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>
-                <NavLink to='settings' className="text-lg mx-auto">Settings</NavLink>
-                <button className="text-lg font-semibold text-red-600" onClick={Logout}>LOG OUT</button>
+                <NavLink to='adduser' className="text-base mx-auto">Add users</NavLink>
+                <NavLink to='settings' className="text-base mx-auto">Settings</NavLink>
+                <button className="text-base font-semibold text-red-600" onClick={Logout}>LOG OUT</button>
             </div>
         </div>
     </nav>

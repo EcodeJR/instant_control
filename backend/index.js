@@ -75,8 +75,13 @@ io.on('connection', (socket) => {
 
   // Handle chat message
   socket.on('chat message', (msg) => {
-      console.log('message: ' + msg);
-      io.emit('chat message', msg);
+    const chatMessage = new Chat({ username: msg.username, message: msg.message });
+    chatMessage.save(function (err) {
+      if (err) return console.error(err);
+      console.log("Message saved to database");
+    });
+    
+    io.emit('chat message', msg);
   });
 });
 
@@ -96,6 +101,32 @@ const NewUser = new Schema({
 }, { timestamps: true });
 
 const PutUser = mongoose.model('Users', NewUser);
+
+// const username = await PutUser.findOne({username});
+app.get('/get-username', (req, res) => {
+  // Get the user ID or email from the request, e.g. from a query parameter
+  const userId = req.query.userId;
+
+  // Find the user in the database
+  PutUser.findById(userId)
+  .then(user => {
+    res.status(200).json({user})
+  })
+  .catch(err => {
+    console.error(err);
+    res.status(404).json('User Not Found');
+  });
+});
+
+//Setting up Messaging functionality
+// Define schema for chat messages
+const chatSchema = new Schema({
+  username: String,
+  message: String
+});
+
+// Compile model from schema
+const Chat = mongoose.model('Chat', chatSchema);
 
 // Route to handle adding user to the db
 app.post('/api/users', async (req, res) => {
@@ -127,12 +158,13 @@ app.post('/api/login', async (req, res) => {
       // Compare hashed password
       const match = await bcrypt.compare(password, user.password);
       const secretKey = process.env.SECRKEY;
+      const userID =  user._id;
   
       if (match) {
         // Generate a token with expiration time (e.g., 1 hour)
         const newToken = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
   
-        res.status(200).json({ newToken });
+        res.status(200).json({ newToken, userID });
       } else {
         res.status(401).send('Incorrect password');
       }
