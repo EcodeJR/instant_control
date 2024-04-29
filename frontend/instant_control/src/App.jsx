@@ -36,7 +36,7 @@ const handleLogin = (token) => {
     setToken('');
     // Remove the cookie for the token
     Cookies.remove('token');
-    console.log('logged out')
+    Cookies.remove('userID');
   };
 
   const tokenCookie = Cookies.get('token');

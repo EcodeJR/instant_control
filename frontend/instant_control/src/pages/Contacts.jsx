@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
+import Cookies from 'js-cookie';
 
 const Contacts = () => {
     const [contact, setContacts] = useState([]);
@@ -40,6 +42,51 @@ const Contacts = () => {
       });
   };
 
+   //Saving delete event to database
+   const ENDPOINT = 'http://localhost:8080';
+
+
+   const [notice, setNotice] = useState('');
+   const [username, setUsername] = useState('');
+   const socket = io(ENDPOINT);
+   
+   useEffect(() => {
+       const userId = Cookies.get('userID');
+         
+       axios.get(`http://localhost:8080/get-username?userId=${userId}`)
+         .then(response => {
+           setUsername(response.data.user.username);
+           setNotice('Deleted a Contact Message.');
+         })
+           .catch(error => {
+               console.error('Error fetching username', error);
+           });
+     }, []);
+   
+     useEffect(() => {
+       socket.on('connect', () => {
+           console.log('Socket Connected to server');
+         });
+         
+         socket.on('connect_error', (error) => {
+           console.log('Socket Connection error:', error);
+         });
+       // Emit the 'file deleted' event to the server after fetching username
+       socket.on("file deleted", (data) => {
+           console.log(data);
+       })
+       
+     
+       return () => {
+       socket.disconnect();
+       console.log('Socket disconnected')
+       };
+     }, [])
+   
+     const EventSave = () => {
+       socket.emit("file deleted", { username, notice});
+     }
+
     return ( <>
     <ToastContainer />
     <div className="w-full h-full text-primary p-5 block lg:absolute top-0 left-0">
@@ -55,7 +102,7 @@ const Contacts = () => {
                 <p className="p-2 bg-primary/5 text-justify rounded">{cont.message}</p>
                 <div className="flex items-center justify-end text-lg font-semibold">
                     <a href={`mailto:${cont.email}`} target="_blank" rel='noreferrer' className="mx-2  uppercase">reply</a>
-                    <button className="uppercase text-red-600" onClick={() => handleDeleteMessage(cont._id)}>delete</button>
+                    <button className="uppercase text-red-600" onClick={() => { handleDeleteMessage(cont._id); EventSave()} }>delete</button>
                 </div>
             </div>
             ))

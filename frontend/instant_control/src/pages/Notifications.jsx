@@ -1,6 +1,52 @@
 import camp from '../assets/camp.jpg'
+// import io from 'socket.io-client';
+// import { useState, useEffect } from 'react';
+// import Cookies from 'js-cookie';
+// import axios from 'axios';
+
+// const ENDPOINT = 'http://localhost:8080';
+
 
 const Notifications = () => {
+
+
+// const [notice, setNotice] = useState('');
+// const [username, setUsername] = useState('');
+// const socket = io(ENDPOINT);
+
+// useEffect(() => {
+//     const userId = Cookies.get('userID');
+      
+//     axios.get(`http://localhost:8080/get-username?userId=${userId}`)
+//       .then(response => {
+//         setUsername(response.data.user.username);
+//         setNotice('Deleted an Email.');
+//       })
+//         .catch(error => {
+//             console.error('Error fetching username', error);
+//         });
+//   }, []);
+
+//   useEffect(() => {
+//     socket.on('connect', () => {
+//         console.log('Socket Connected to server');
+//       });
+      
+//       socket.on('connect_error', (error) => {
+//         console.log('Socket Connection error:', error);
+//       });
+//     // Emit the 'file deleted' event to the server after fetching username
+//     socket.on("file deleted", (data) => {
+//         console.log(data);
+//     })
+//     socket.emit("file deleted", { username, notice});
+  
+//     return () => {
+//     socket.disconnect();
+//     console.log('Socket disconnected')
+//     };
+//   }, [])
+  
     return ( 
         <section className="w-full h-fit p-5 bg-gray-200 block lg:absolute top-0 left-0">
             <h1 className="text-center font-semibold text-xl lg:text-2xl" draggable='true'>Notifications</h1>

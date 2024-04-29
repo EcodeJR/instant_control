@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
+import Cookies from 'js-cookie';
 
 const Newslatters = () => {
 
@@ -75,6 +77,51 @@ const Newslatters = () => {
     }
   };
 
+  //Saving delete event to database
+  const ENDPOINT = 'http://localhost:8080';
+
+
+const [notice, setNotice] = useState('');
+const [username, setUsername] = useState('');
+const socket = io(ENDPOINT);
+
+useEffect(() => {
+    const userId = Cookies.get('userID');
+      
+    axios.get(`http://localhost:8080/get-username?userId=${userId}`)
+      .then(response => {
+        setUsername(response.data.user.username);
+        setNotice('Deleted an Email.');
+      })
+        .catch(error => {
+            console.error('Error fetching username', error);
+        });
+  }, []);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+        console.log('Socket Connected to server');
+      });
+      
+      socket.on('connect_error', (error) => {
+        console.log('Socket Connection error:', error);
+      });
+    // Emit the 'file deleted' event to the server after fetching username
+    socket.on("file deleted", (data) => {
+        console.log(data);
+    })
+    
+  
+    return () => {
+    socket.disconnect();
+    console.log('Socket disconnected')
+    };
+  }, [])
+
+  const EventSave = () => {
+    socket.emit("file deleted", { username, notice});
+  }
+
     return ( <>
     <ToastContainer />
     <div className="w-full h-full text-primary p-5 block lg:absolute top-0 left-0">
@@ -115,7 +162,8 @@ const Newslatters = () => {
                 </a>
               </td>
               <td className='p-2 border-2 box-border block md:table-cell'>
-                <button className='px-3 py-2 rounded-sm text-white bg-red-600 font-semibold uppercase' onClick={() => handleDeleteEmail(email._id)}>
+                <button className='px-3 py-2 rounded-sm text-white bg-red-600 font-semibold uppercase' onClick={() => {handleDeleteEmail(email._id); 
+                  EventSave()}}>
                   Delete
                 </button>
               </td>
@@ -123,9 +171,11 @@ const Newslatters = () => {
           ))
         ) : (
           // If there are no emails, render a message
-          <div className='h-full w-full flex items-center justify-center p-10'>
-            <h1 className='text-3xl text-primary text-center'>OOPS.. No data to show here!!</h1>
-          </div>
+          <tr className='h-full w-full flex items-center justify-center p-10'>
+            <td>
+              <h1 className='text-3xl text-primary text-center'>OOPS.. No data to show here!!</h1>
+            </td>
+          </tr>
         )}
 
         

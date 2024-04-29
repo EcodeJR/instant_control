@@ -56,22 +56,6 @@ var links = [
 const Sidebar = ({ onLogout }) => {
     const [openNav, isOpen] = useState(false);
 
-    const [user, setUser] = useState('john');
-//   const userId = match.params.userId;
-
-//   useEffect(() => {
-//     const fetchUserDetails = async () => {
-//       try {
-//         // Make a GET request to your Express.js server to get user details by ID
-//         const response = await axios.get(`http://localhost:8080/user/${username}`);
-//         setUser(response.data);
-//       } catch (error) {
-//         console.error('Error fetching user details:', error);
-//       }
-//     };
-
-//     fetchUserDetails();
-//   }, []);
 
     const Logout = () => {
         const token = '';
@@ -90,7 +74,7 @@ const Sidebar = ({ onLogout }) => {
       .then(response => {
         // If the request was successful, set the username in the state
         setUsername(response.data.user.username);
-        // console.log(response)
+        // console.log(response.data.user.username);
       })
       .catch(error => {
         console.error('Error fetching username', error);
@@ -100,7 +84,7 @@ const Sidebar = ({ onLogout }) => {
     const smallScreen = <>
      <nav className="w-[60vw] lg:w-full h-full bg-gray-100 text-primary fixed z-50 lg:block top-0">
             <div className="w-full h-fit border-b-2 border-b-primary/10 py-7">
-                <h1 className="text-secondary font-semibold text-center text-4xl">INSTANT</h1>
+                <h1 className="text-secondary font-semibold text-center text-2xl">INSTANT</h1>
             </div>
             <div className="w-full h-fit py-10 flex flex-col items-center justify-around">
                 <div className="w-fit mx-auto">
@@ -118,7 +102,7 @@ const Sidebar = ({ onLogout }) => {
                     <div className="flex items-end justify-center pb-3">
                         <div className="w-10 h-10 bg-primary text-white rounded-full grid place-items-center mx-2">IMG</div>
                         
-                        {user ? (<p className="font-semibold text-base">{`WELCOME ${username}`}</p>) : (<p>Please Login first..</p>)}
+                        {username ? (<div className="flex flex-col items-center justify-center"><p className="font-semibold text-sm text-gray-500">welcome</p><p className="font-semibold text-lg text-primary uppercase">{username}</p></div>) : (<marquee direction="left" className="text-sm text-red-500">Please refresh the page or check your internet connection..</marquee>)}
                     </div>
                     <NavLink to='adduser' className="text-lg mx-auto">Add users</NavLink>
                     <NavLink to='settings' className="text-lg mx-auto">Settings</NavLink>
@@ -142,8 +126,8 @@ const Sidebar = ({ onLogout }) => {
     </div>
     <button className="absolute lg:hidden top-[50%] translate-y-[-50%] right-3 z-30" onClick={toggleOpen}>{openNav ? <MdClose className="text-3xl font-bold text-primary" /> : <MdOutlineMenu className="text-3xl font-bold text-primary" />}</button>
     <nav className="w-full h-full bg-gray-100 text-primary hidden lg:block relative">
-        <div className="w-full h-fit border-b-2 border-b-primary/10 py-5">
-            <h1 className="text-secondary font-semibold text-center text-4xl">INSTANT</h1>
+        <div className="w-full h-fit border-b-2 border-b-primary/10 py-3">
+            <h1 className="text-secondary font-semibold text-center text-3xl">INSTANT</h1>
         </div>
         <div className="w-full h-fit py-5 flex flex-col items-center justify-around">
             <div className="w-fit mx-auto">
@@ -157,10 +141,10 @@ const Sidebar = ({ onLogout }) => {
                     </div>
                 ))}
             </div>
-            <div className="p-3 rounded-md bg-white flex flex-col min-w-[70%]">
+            <div className="p-3 rounded-md bg-white flex flex-col min-w-[70%] mx-2">
                 <div className="flex items-end justify-center pb-2">
                     <img src={camp} alt="man sitting" className="w-10 h-10 bg-primary text-white rounded-full mx-2 object-cover" />
-                    {user ? (<p className="font-semibold text-base">{`WELCOME ${username}`}</p>) : (<p>Please Login first..</p>)}
+                    {username ? (<div className="flex flex-col items-center justify-center"><p className="font-semibold text-sm text-gray-500">welcome</p><p className="font-semibold text-lg text-primary uppercase">{username}</p></div>) : (<marquee direction="left" className="text-sm text-red-500">Please refresh the page or check your internet connection..</marquee>)}
                 </div>
                 <NavLink to='adduser' className="text-base mx-auto">Add users</NavLink>
                 <NavLink to='settings' className="text-base mx-auto">Settings</NavLink>

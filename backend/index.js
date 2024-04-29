@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { Server } from 'socket.io';
 import http from 'http';
+import { Socket } from 'dgram';
 // import crypto from 'crypto';
 // import axios from 'axios';
 
@@ -23,12 +24,7 @@ app.use(cors({
   allowedHeaders: '*',
   credentials: true, // Enable credentials (if your frontend sends cookies, sessions, or authentication tokens)
 }));
-// app.use(function (req, res, next) {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader("Access-Control-Allow-Methods", "*");
-//   res.setHeader("Access-Control-Allow-Headers", "*");
-//   next();
-// });
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -37,13 +33,6 @@ const io = new Server(server, {
   }
 });
 
-
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*'); // You can specify specific origins instead of '*'
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//   next();
-// });
 
 app.use(bodyParser.json());
   
@@ -64,30 +53,19 @@ mongoose.connect(mongodbURL)
 // Setting up socket.io to run from anywhere(domain).
 // io.origins('*:*');
 
-// Socket.IO event handlers
-io.on('connection', (socket) => {
-  console.log('A user connected');
+//SOCKET.IO LOGIC TAKEN FROM HERE.................................................
 
-  // Handle disconnection
-  socket.on('disconnect', () => {
-      console.log('User disconnected');
-  });
 
-  // Handle chat message
-  socket.on('chat message', (msg) => {
-    const chatMessage = new Chat({ username: msg.username, message: msg.message });
-    chatMessage.save(function (err) {
-      if (err) return console.error(err);
-      console.log("Message saved to database");
-    });
-    
-    io.emit('chat message', msg);
-  });
-});
+
+
+
+
+// const collection = mongoose.db("INSTANT").collection("Newslatter");
 
 
 //Setting up mongoose schema for DB
 const Schema = mongoose.Schema;
+
 
 const NewUser = new Schema({
     username: { type: String, 
@@ -104,7 +82,7 @@ const PutUser = mongoose.model('Users', NewUser);
 
 // const username = await PutUser.findOne({username});
 app.get('/get-username', (req, res) => {
-  // Get the user ID or email from the request, e.g. from a query parameter
+  // Get the user ID from the request, e.g. from a query parameter
   const userId = req.query.userId;
 
   // Find the user in the database
@@ -127,6 +105,27 @@ const chatSchema = new Schema({
 
 // Compile model from schema
 const Chat = mongoose.model('Chat', chatSchema);
+
+//Notification Schema
+const notificationSchema = new Schema({
+  username: String,
+  notice: String
+});
+
+// Compile model from schema
+const Notification = mongoose.model('Notification', notificationSchema);
+
+// Get all messagesfrom db
+app.get('/api/messages', async (req, res) => {
+  try {
+    const messages = await Chat.find().sort({ timestamp: -1 });
+    res.json(messages);
+    // console.log(messages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 // Route to handle adding user to the db
 app.post('/api/users', async (req, res) => {
@@ -204,7 +203,76 @@ const newsletterSchema = new mongoose.Schema({
 
 const Newsletter = mongoose.model('Newslatter', newsletterSchema);
 
-// Define MongoDB model for Contact Forms
+  //here---------------------------------------------------------------
+  // Socket.IO event handlers
+io.on('connection', (socket) => {
+  // console.log('A user connected');
+
+  // Handle disconnection
+  socket.on('disconnect', () => {
+      // console.log('User disconnected');
+  });
+
+  // Handle chat message
+  socket.on('chat message', (msg) => {
+
+    async function handleChatMessage(msg) {
+      try {
+        const chatMessage = new Chat({
+          username: msg.username,
+          message: msg.message
+        });
+
+        // Save the message to the database
+        await chatMessage.save();
+        console.log('Message saved to the database');
+
+        // Emit the message to all connected clients
+        io.emit('chat message', msg);
+      } catch (err) {
+        console.error('Error saving message to database:', err);
+      }
+    }
+
+    // Usage example:
+    handleChatMessage(msg);
+  });
+// Handle 'file deleted' event
+  socket.on('file deleted', async (data) => {
+    console.log(data);
+    try {
+      // Assuming Notification is a model or a class
+      const notify = new Notification({
+        username: data.username,
+        notice: data.notice
+      });
+
+      // Save the notification to the database
+      await notify.save();
+      console.log('Notification saved to the database');
+
+      // Emit the 'file deleted' event to all connected clients
+      io.emit('file deleted', data);
+      console.log('file removed:', data);
+    } catch (err) {
+      console.error('Error saving notification to database:', err);
+    }
+  });
+  
+});
+
+ // Watching for changes in the Newsletter collection
+// Newsletter.watch().on('change', async (change) => {
+//   // Check if the change event involves deletion
+//   if (change.operationType === 'delete') {
+//     const deletedEmail = change.documentKey._id; // Assuming _id is used as the identifier
+//     // Emit the 'file deleted' event with the deleted email data and the username received from the frontend
+//     io.emit('file deleted');
+//     console.log('File removed:', deletedEmail);
+//   }
+// });
+
+  // Define MongoDB model for Contact Forms
 const contact_us = new mongoose.Schema({
   name: { type: String, 
     required: true
@@ -402,5 +470,3 @@ app.post('/send-newsletter', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-// console.log(process.env.EMAIL + "is the email and " + process.env.PASSCODE + "the password.");
