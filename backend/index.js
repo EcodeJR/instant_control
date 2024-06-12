@@ -115,6 +115,17 @@ const notificationSchema = new Schema({
 // Compile model from schema
 const Notification = mongoose.model('Notification', notificationSchema);
 
+// Get all notifications
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const notify = await Notification.find().sort({ timestamp: -1 });
+    res.json(notify);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // Get all messagesfrom db
 app.get('/api/messages', async (req, res) => {
   try {
