@@ -12,6 +12,11 @@ import axios from "axios";
 
 import { MdOutlineMenu } from "react-icons/md";
 import { MdClose } from "react-icons/md";
+import { MdOutlineNotifications } from "react-icons/md";
+import { BiMessageRounded } from "react-icons/bi";
+
+import { Badge } from 'primereact/badge';
+import io from 'socket.io-client';
 
 import camp from '../assets/camp.jpg';
 // import Cookies from 'js-cookie';
@@ -81,6 +86,32 @@ const Sidebar = ({ onLogout }) => {
       });
   }, []);
 
+  
+  const [deletedFilesCount, setDeletedFilesCount] = useState(0);
+  const ENDPOINT = 'http://localhost:8080';
+const socket = io(ENDPOINT);
+
+    useEffect(() => {
+        // Listen for the file_deleted event
+        socket.on('file deleted', () => {
+            setDeletedFilesCount((prevCount) => prevCount + 1);
+            // Cookies.set('Count', Count, { expires: 100 });
+            //Continue from here(Trying to get the deleteFileCount to not change after page refresh)
+            //Heres what your trying to do
+            //---save the count in locatestorage upon every change
+            //---Then test to see if the state stays on all users even after page refresh.
+            console.log('State updated.........')
+        });
+
+        // Cleanup on component unmount
+        return () => {
+            socket.off('file deleted');
+        };
+    }, []);
+    const ResetCounter = () => {
+        setDeletedFilesCount(0);
+    }
+
     const smallScreen = <>
      <nav className="w-[60vw] lg:w-full h-full bg-gray-100 text-primary fixed z-50 lg:block top-0">
             <div className="w-full h-fit border-b-2 border-b-primary/10 py-7">
@@ -120,9 +151,14 @@ const Sidebar = ({ onLogout }) => {
 // "w-full h-full bg-gray-100 text-primary absolute lg:block"
     
     return ( <>
-    <div className="w-[50%] lg:w-full h-full lg:h-fit my-auto flex items-center justify-around py-2 px-4">
-        <NavLink to='messages'>Messages</NavLink>
-        <NavLink to='notifications'>Notification</NavLink>
+    <div className="w-[50%] lg:w-full h-full lg:h-fit my-auto flex items-center justify-center py-2 px-4">
+        <NavLink to='messages' className="text-2xl mx-2 text-primary">
+            <BiMessageRounded />
+        </NavLink>
+        <NavLink to='notifications' className="text-2xl mx-2 text-primary relative" onClick={ResetCounter}>
+            <MdOutlineNotifications />
+            <Badge value={deletedFilesCount} severity="danger" className="bg-red-500 text-white p-1 rounded-full absolute -top-[50%] -right-[30%] text-xs"></Badge>
+        </NavLink>
     </div>
     <button className="absolute lg:hidden top-[50%] translate-y-[-50%] right-3 z-30" onClick={toggleOpen}>{openNav ? <MdClose className="text-3xl font-bold text-primary" /> : <MdOutlineMenu className="text-3xl font-bold text-primary" />}</button>
     <nav className="w-full h-full bg-gray-100 text-primary hidden lg:block relative">
