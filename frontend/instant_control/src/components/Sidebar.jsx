@@ -107,7 +107,7 @@ const socket = io(ENDPOINT);
         return () => {
             socket.off('file deleted');
         };
-    }, []);
+    }, [socket]);
     const ResetCounter = () => {
         setDeletedFilesCount(0);
     }
