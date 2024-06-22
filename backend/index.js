@@ -214,6 +214,25 @@ const newsletterSchema = new mongoose.Schema({
 
 const Newsletter = mongoose.model('Newslatter', newsletterSchema);
 
+
+// Define MongoDB model for Newsletter
+const notificationalertSchema = new mongoose.Schema({
+  noticealt: { type: Number, required: true },
+});
+
+const Noticealert = mongoose.model('NoticeAlert', notificationalertSchema);
+
+// Get all notice alerts
+app.get('/api/noticealert', async (req, res) => {
+  try {
+    const noticealt = await Noticealert.findOne().sort({ timestamp: -1 });
+    res.json(noticealt);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
   //here---------------------------------------------------------------
   // Socket.IO event handlers
 io.on('connection', (socket) => {
@@ -258,8 +277,13 @@ io.on('connection', (socket) => {
         notice: data.notice
       });
 
+      const notifyalert = new Noticealert({
+        noticealt: data.deletedFilesCount
+      })
+
       // Save the notification to the database
       await notify.save();
+      await notifyalert.save(); // --------debug from here notice isn't being saved --Theory check the data sent from the frontend
       console.log('Notification saved to the database');
 
       // Emit the 'file deleted' event to all connected clients

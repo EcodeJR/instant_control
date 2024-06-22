@@ -60,6 +60,7 @@ var links = [
 
 const Sidebar = ({ onLogout }) => {
     const [openNav, isOpen] = useState(false);
+    const [noticealt, setNoticealt] = useState();
 
 
     const Logout = () => {
@@ -87,7 +88,7 @@ const Sidebar = ({ onLogout }) => {
   }, []);
 
   
-  const [deletedFilesCount, setDeletedFilesCount] = useState(0);
+  const [deletedFilesCount, setDeletedFilesCount] = useState(noticealt);
   const ENDPOINT = 'http://localhost:8080';
 const socket = io(ENDPOINT);
 
@@ -95,12 +96,12 @@ const socket = io(ENDPOINT);
         // Listen for the file_deleted event
         socket.on('file deleted', () => {
             setDeletedFilesCount((prevCount) => prevCount + 1);
+            socket.emit("file deleted", { deletedFilesCount });
             // Cookies.set('Count', Count, { expires: 100 });
             //Continue from here(Trying to get the deleteFileCount to not change after page refresh)
             //Heres what your trying to do
             //---save the count in locatestorage upon every change
             //---Then test to see if the state stays on all users even after page refresh.
-            console.log('State updated.........')
         });
 
         // Cleanup on component unmount
@@ -111,6 +112,19 @@ const socket = io(ENDPOINT);
     const ResetCounter = () => {
         setDeletedFilesCount(0);
     }
+
+
+  useEffect(() => {
+    // Fetch notice alert from the backend when the component mounts
+    axios.get('http://localhost:8080/api/noticealert')
+      .then(response => {
+        setNoticealt(response.data);
+        // console.log(contact)
+      })
+      .catch(error => {
+        console.error('Error fetching emails:', error);
+      });
+  }, [noticealt]);
 
     const smallScreen = <>
      <nav className="w-[60vw] lg:w-full h-full bg-gray-100 text-primary fixed z-50 lg:block top-0">
