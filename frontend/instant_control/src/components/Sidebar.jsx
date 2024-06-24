@@ -93,10 +93,18 @@ const Sidebar = ({ onLogout }) => {
 const socket = io(ENDPOINT);
 
     useEffect(() => {
+        socket.on('connect', () => {
+            console.log('Socket Connected to server');
+          });
+          
+          socket.on('connect_error', (error) => {
+            console.log('Socket Connection error:', error);
+          });
         // Listen for the file_deleted event
-        socket.on('file deleted', () => {
+        socket.on('file deleted', (data) => {
             setDeletedFilesCount((prevCount) => prevCount + 1);
-            socket.emit("file deleted", { deletedFilesCount });
+            socket.emit("file deleted", { deletedFilesCount: deletedFilesCount });
+            console.log(data);
             // Cookies.set('Count', Count, { expires: 100 });
             //Continue from here(Trying to get the deleteFileCount to not change after page refresh)
             //Heres what your trying to do
@@ -106,9 +114,9 @@ const socket = io(ENDPOINT);
 
         // Cleanup on component unmount
         return () => {
-            socket.off('file deleted');
+            socket.disconnect();
         };
-    }, [socket]);
+    }, [socket, deletedFilesCount]);
     const ResetCounter = () => {
         setDeletedFilesCount(0);
     }

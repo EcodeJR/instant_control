@@ -217,16 +217,16 @@ const Newsletter = mongoose.model('Newslatter', newsletterSchema);
 
 // Define MongoDB model for Newsletter
 const notificationalertSchema = new mongoose.Schema({
-  noticealt: { type: Number, required: true },
+  deletedFilesCount: { type: Number, required: true },
 });
 
-const Noticealert = mongoose.model('NoticeAlert', notificationalertSchema);
+const NoticeAlert = mongoose.model('NoticeAlert', notificationalertSchema);
 
 // Get all notice alerts
 app.get('/api/noticealert', async (req, res) => {
   try {
-    const noticealt = await Noticealert.findOne().sort({ timestamp: -1 });
-    res.json(noticealt);
+    const noticealrt = await NoticeAlert.findOne().sort({ timestamp: -1 });
+    res.json(noticealrt);
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -277,8 +277,8 @@ io.on('connection', (socket) => {
         notice: data.notice
       });
 
-      const notifyalert = new Noticealert({
-        noticealt: data.deletedFilesCount
+      const notifyalert = new NoticeAlert({
+        deletedFilesCount: data.deletedFilesCount
       })
 
       // Save the notification to the database

@@ -116,7 +116,7 @@ useEffect(() => {
     socket.disconnect();
     console.log('Socket disconnected')
     };
-  }, [])
+  }, [socket])
 
   const EventSave = () => {
     socket.emit("file deleted", { username, notice});
